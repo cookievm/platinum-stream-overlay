@@ -1,1 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Platinum Team — Platinum Sprites</title>
+<style>
+  html,body{margin:0;width:100%;height:100%;overflow:hidden;background:transparent!important}
+  body{display:flex;align-items:center;justify-content:center}
+  #team{
+    width:100vw;height:100vh;
+    display:flex;align-items:center;justify-content:space-evenly;
+    gap:1.5vw;padding:1.5vw;box-sizing:border-box;
+    background:transparent!important;
+  }
+  .slot{
+    flex:1 1 0;height:100%;
+    display:flex;align-items:center;justify-content:center;
+    background:transparent!important;
+  }
+  .slot img{
+    display:block;
+    width:auto;height:auto;
+    max-width:100%;max-height:100%;
+    image-rendering:pixelated;
+    image-rendering:crisp-edges;
+  }
+  .empty{visibility:hidden}
+</style>
+</head>
+<body>
+<div id="team">
+  <div class="slot"><img id="p0" class="empty"></div>
+  <div class="slot"><img id="p1" class="empty"></div>
+  <div class="slot"><img id="p2" class="empty"></div>
+  <div class="slot"><img id="p3" class="empty"></div>
+  <div class="slot"><img id="p4" class="empty"></div>
+  <div class="slot"><img id="p5" class="empty"></div>
+</div>
 
+<script type="module">
+import { V2 } from "./pokelink.js";
+
+const q = new URLSearchParams(location.search);
+const host = q.get("server") || "localhost";
+const port = Number(q.get("port") || 3000);
+const users = q.get("users") || "cookievm";
+
+function platinumSprite(mon){
+  const species = Number(mon?.species);
+  if(!Number.isInteger(species) || species < 1 || species > 493) return "";
+  const shiny = mon?.isShiny === true ? "shiny/" : "";
+  const female = mon?.gender === "female" ? "female/" : "";
+  // Platinum has female-specific fronts only for species that actually provide them.
+  // Try the most-specific official Gen IV asset first, then fall back to the standard Platinum front.
+  return {
+    primary:`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-iv/platinum/${shiny}${female}${species}.png`,
+    fallback:`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-iv/platinum/${shiny}${species}.png`
+  };
+}
+
+function showParty(party){
+  for(let i=0;i<6;i++){
+    const img=document.getElementById("p"+i);
+    const mon=party?.[i];
+    if(mon && V2.isValidPokemon(mon)){
+      const urls=platinumSprite(mon);
+      if(urls){
+        img.onerror=()=>{
+          if(img.src !== urls.fallback){
+            img.onerror=()=>{ img.removeAttribute("src"); img.classList.add("empty"); };
+            img.src=urls.fallback;
+          }else{
+            img.removeAttribute("src");
+            img.classList.add("empty");
+          }
+        };
+        img.src=urls.primary;
+        img.alt="";
+        img.classList.remove("empty");
+      }else{
+        img.removeAttribute("src");
+        img.classList.add("empty");
+      }
+    }else{
+      img.removeAttribute("src");
+      img.classList.add("empty");
+    }
+  }
+}
+
+V2.onPartyUpdate((party, username)=>{
+  if(!username || username===users) showParty(party);
+});
+
+V2.initialize({
+  numberOfPlayers:1,
+  listenForSpriteUpdates:false,
+  host,
+  port,
+  users:[users],
+  useFallbackSprites:true
+});
+</script>
+</body>
+</html>
