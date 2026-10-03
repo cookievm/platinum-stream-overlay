@@ -3,79 +3,38 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Platinum Compact Next Gym</title>
+<title>Platinum Next Gym</title>
 <style>
 *{box-sizing:border-box}
-html,body{
-  margin:0;width:100%;height:100%;overflow:hidden;
-  background:transparent!important;
-  font-family:"Segoe UI",Arial,sans-serif;color:#fff
-}
-.wrap{
-  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
-  background:transparent!important;padding:2px
-}
-.bar{
-  width:100%;height:100%;min-height:46px;
-  display:grid;grid-template-columns:42px minmax(105px,1fr) auto auto;
-  align-items:center;gap:7px;padding:3px 12px 3px 7px;
-  border:0;border-radius:999px;background:transparent!important;
-}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:transparent!important;font-family:"Segoe UI",Arial,sans-serif;color:#fff}
+.wrap{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:transparent!important;padding:2px}
+.bar{width:100%;height:100%;min-height:46px;display:grid;grid-template-columns:42px minmax(105px,1fr) auto auto;align-items:center;gap:7px;padding:3px 12px 3px 7px;border:0;border-radius:999px;background:transparent!important}
 .spriteBox{width:40px;height:40px;display:grid;place-items:center}
-.sprite{
-  max-width:40px;max-height:40px;image-rendering:pixelated;
-  filter:drop-shadow(0 2px 3px #000)
-}
+.sprite{max-width:40px;max-height:40px;image-rendering:pixelated;filter:drop-shadow(0 2px 3px #000)}
 .info{min-width:0}
-.label{
-  font-size:7px;line-height:1;letter-spacing:.16em;font-weight:900;
-  color:#d5d8ff;text-shadow:0 1px 3px #000,0 0 5px #000
-}
-.name{
-  margin-top:2px;font-size:15px;line-height:1;font-weight:950;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  text-shadow:0 2px 3px #000,0 0 7px #000
-}
-.city{
-  margin-top:2px;font-size:7px;line-height:1;color:#fff;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  text-shadow:0 1px 3px #000,0 0 5px #000
-}
-.stat{
-  min-width:55px;text-align:center;padding-left:6px;
-  border-left:1px solid rgba(210,215,255,.65)
-}
-.stat small{
-  display:block;font-size:5.5px;line-height:1.05;letter-spacing:.05em;
-  font-weight:900;color:#e7e9ff;text-shadow:0 1px 3px #000,0 0 5px #000
-}
-.stat strong{
-  display:block;margin-top:1px;font-size:19px;line-height:1;font-weight:950;
-  text-shadow:0 2px 3px #000,0 0 8px #63d8ff
-}
-.status{display:none}
-@media(max-width:430px){
-  .bar{grid-template-columns:36px minmax(90px,1fr) auto auto;gap:4px;padding-right:8px}
-  .spriteBox{width:34px;height:34px}.sprite{max-width:34px;max-height:34px}
-  .name{font-size:13px}.stat{min-width:48px;padding-left:4px}.stat strong{font-size:17px}
-}
+.label{font-size:7px;line-height:1;letter-spacing:.16em;font-weight:900;color:#d5d8ff;text-shadow:0 1px 3px #000,0 0 5px #000}
+.name{margin-top:2px;font-size:15px;line-height:1;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 2px 3px #000,0 0 7px #000}
+.city{margin-top:2px;font-size:7px;line-height:1;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 3px #000,0 0 5px #000}
+.stat{min-width:55px;text-align:center;padding-left:6px;border-left:1px solid rgba(210,215,255,.65)}
+.stat small{display:block;font-size:5.5px;line-height:1.05;letter-spacing:.05em;font-weight:900;color:#e7e9ff;text-shadow:0 1px 3px #000,0 0 5px #000}
+.stat strong{display:block;margin-top:1px;font-size:19px;line-height:1;font-weight:950;text-shadow:0 2px 3px #000,0 0 8px #63d8ff}
+#diag{position:fixed;left:4px;bottom:1px;font:6px Arial;color:rgba(255,255,255,.55);text-shadow:0 1px 2px #000;display:none}
+body.debug #diag{display:block}
+@media(max-width:430px){.bar{grid-template-columns:36px minmax(90px,1fr) auto auto;gap:4px;padding-right:8px}.spriteBox{width:34px;height:34px}.sprite{max-width:34px;max-height:34px}.name{font-size:13px}.stat{min-width:48px;padding-left:4px}.stat strong{font-size:17px}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="bar">
-    <div class="spriteBox"><img id="sprite" class="sprite" alt=""></div>
-    <div class="info">
-      <div class="label" id="nextLabel">NEXT GYM</div>
-      <div class="name" id="nextName">ROARK</div>
-      <div class="city" id="nextCity">Oreburgh City</div>
-    </div>
-    <div class="stat"><small>ACE<br>LEVEL</small><strong id="ace">14</strong></div>
-    <div class="stat"><small>LEVEL<br>CAP</small><strong id="cap">12</strong></div>
-    <div class="status" id="status">POKÉLINK SEARCHING</div>
-  </div>
-</div>
+<div class="wrap"><div class="bar">
+  <div class="spriteBox"><img id="sprite" class="sprite" alt=""></div>
+  <div class="info"><div class="label" id="nextLabel">NEXT GYM</div><div class="name" id="nextName">ROARK</div><div class="city" id="nextCity">Oreburgh City</div></div>
+  <div class="stat"><small>ACE<br>LEVEL</small><strong id="ace">14</strong></div>
+  <div class="stat"><small>LEVEL<br>CAP</small><strong id="cap">12</strong></div>
+</div></div>
+<div id="diag">Starting…</div>
+
 <script>
+const USER="cookievm";
+const PORT=3000;
 const encounters=[
  ['Roark','Oreburgh City',14,12,'gym','Spr_Pt_Roark.png'],
  ['Gardenia','Eterna City',22,19,'gym','Spr_Pt_Gardenia.png'],
@@ -91,49 +50,86 @@ const encounters=[
  ['Lucian','Pokémon League',59,49,'elite','Spr_Pt_Lucian.png'],
  ['Cynthia','Pokémon League',62,50,'champion','Spr_Pt_Cynthia.png']
 ];
+
 const q=new URLSearchParams(location.search);
-let completed=Math.max(0,Math.min(13,parseInt(q.get('progress')||q.get('badges')||'0')||0));
+if(q.has("debug")) document.body.classList.add("debug");
+let completed=Math.max(0,Math.min(13,parseInt(q.get("progress") ?? q.get("badges") ?? "0",10)||0));
+
+const $=id=>document.getElementById(id);
+function setDiag(t){$("diag").textContent=t}
 function render(){
- const g=encounters[Math.min(completed,12)];
- nextLabel.textContent=completed>=13?'NUZLOCKE COMPLETE':g[4]==='gym'?'NEXT GYM':g[4]==='elite'?'NEXT ELITE FOUR':'CHAMPION';
- nextName.textContent=completed>=13?'SINNOH COMPLETE':g[0].toUpperCase();
- nextCity.textContent=g[1]; ace.textContent=g[2]; cap.textContent=g[3];
- sprite.src='https://archives.bulbagarden.net/wiki/Special:Redirect/file/'+g[5];
- sprite.style.visibility=completed>=13?'hidden':'visible';
+ if(completed>=13){
+   $("nextLabel").textContent="NUZLOCKE COMPLETE"; $("nextName").textContent="SINNOH COMPLETE";
+   $("nextCity").textContent="Pokémon League"; $("ace").textContent="—"; $("cap").textContent="—";
+   $("sprite").style.visibility="hidden"; return;
+ }
+ const g=encounters[completed];
+ $("nextLabel").textContent=g[4]==="gym"?"NEXT GYM":g[4]==="elite"?"NEXT ELITE FOUR":"CHAMPION";
+ $("nextName").textContent=g[0].toUpperCase(); $("nextCity").textContent=g[1];
+ $("ace").textContent=g[2]; $("cap").textContent=g[3];
+ $("sprite").style.visibility="visible";
+ $("sprite").src="https://archives.bulbagarden.net/wiki/Special:Redirect/file/"+g[5];
 }
 render();
-function badgeCount(o){
- const b=o?.trainer?.badges??o?.update?.trainer?.badges??o?.badges??o?.update?.badges;
- if(!Array.isArray(b))return null;
- return b.filter(x=>x===true||x?.value===true||x?.obtained===true||x?.earned===true).length;
+
+function earned(v){
+ if(v===true || v===1 || v==="1") return true;
+ if(!v || typeof v!=="object") return false;
+ return v.obtained===true || v.earned===true || v.value===true || v.acquired===true || v.hasBadge===true;
 }
-function apply(data){
- for(const p of (Array.isArray(data)?data:[data]).filter(Boolean)){
-  const n=badgeCount(p);
-  if(n!==null){completed=Math.max(completed,Math.min(8,n));render();return}
+function findBadges(x, depth=0){
+ if(depth>6 || x==null) return null;
+ if(Array.isArray(x)){
+   if(x.length>=8 && x.length<=32) {
+     const n=x.filter(earned).length;
+     if(n>0 || x.some(v=>typeof v==="boolean" || (v&&typeof v==="object"))) return x;
+   }
+   for(const v of x){ const r=findBadges(v,depth+1); if(r) return r; }
+ } else if(typeof x==="object"){
+   for(const key of ["badges","gymBadges","trainerBadges"]){
+     if(Array.isArray(x[key])) return x[key];
+   }
+   for(const v of Object.values(x)){ const r=findBadges(v,depth+1); if(r) return r; }
  }
+ return null;
 }
-function loadSocket(port){
- return new Promise((resolve,reject)=>{
-  const s=document.createElement('script');
-  s.src='http://127.0.0.1:'+port+'/socket.io/socket.io.js';
-  s.onload=()=>resolve(port);s.onerror=reject;document.head.appendChild(s)
- })
+function applyPayload(payload){
+ const badges=findBadges(payload);
+ if(!badges) return false;
+ const count=Math.min(8,badges.filter(earned).length);
+ // Badge data controls gyms only. ?progress=8..13 remains the manual Elite Four/Champion fallback.
+ if(completed<8 || count>=completed){ completed=count; render(); }
+ setDiag("Pokélink connected • "+count+" badge"+(count===1?"":"s"));
+ return true;
 }
-(async()=>{
- const ports=q.get('port')?[q.get('port')]:['8080','3000','8000','5000','8888'];
- for(const p of ports){
-  try{
-   await loadSocket(p);if(typeof io==='undefined')continue;
-   const s=io('http://127.0.0.1:'+p,{reconnection:true,timeout:1800});
-   s.on('connect',()=>status.textContent='POKÉLINK CONNECTED');
-   s.on('disconnect',()=>status.textContent='POKÉLINK RECONNECTING');
-   ['client:players:list','player:trainer:updated','client:badges:updated'].forEach(ev=>s.on(ev,apply));
-   return
-  }catch(_){}
- }
- status.textContent='MANUAL MODE';
-})();
+
+function connect(){
+ setDiag("Connecting to Pokélink "+USER+" : "+PORT+"…");
+ const script=document.createElement("script");
+ script.src="http://127.0.0.1:"+PORT+"/socket.io/socket.io.js";
+ script.onload=()=>{
+   try{
+     const socket=io("http://127.0.0.1:"+PORT,{
+       query:{user:USER,username:USER},
+       transports:["websocket","polling"],
+       reconnection:true, timeout:3000
+     });
+     socket.on("connect",()=>{
+       setDiag("Pokélink connected • waiting for badge data");
+       // These emits are harmless if this Pokélink build does not use them.
+       ["client:players:list","players:list","player:list"].forEach(e=>{try{socket.emit(e,{user:USER,username:USER})}catch(_){}});
+     });
+     socket.onAny((event,...args)=>{
+       if(/player|trainer|badge|session/i.test(event)) args.forEach(applyPayload);
+     });
+     socket.on("connect_error",()=>setDiag("Pokélink blocked/unreachable • use ?progress=N"));
+     socket.on("disconnect",()=>setDiag("Pokélink disconnected • reconnecting"));
+   }catch(e){ setDiag("Pokélink connection error • use ?progress=N"); }
+ };
+ script.onerror=()=>setDiag("Browser blocked local Pokélink • use ?progress=N");
+ document.head.appendChild(script);
+}
+connect();
 </script>
 </body>
 </html>
