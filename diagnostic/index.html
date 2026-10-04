@@ -1,0 +1,20 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Pokelink Battle Diagnostic</title>
+<style>body{background:#090817;color:white;font-family:Arial;padding:18px}button{margin:4px;padding:10px;background:#6335f5;color:white;border:0;border-radius:8px}#log{white-space:pre-wrap;background:#05050c;padding:12px;height:70vh;overflow:auto;font:12px Consolas;border:1px solid #6335f5}#status{padding:10px;margin:10px 0;background:#171443}</style></head>
+<body><h2>Pokélink v0.7.1 Battle Diagnostic</h2><p>Keep this open during a trainer battle. Let the enemy use several moves and switch Pokémon if possible, then download the log.</p>
+<button onclick="downloadLog()">Download Log</button><button onclick="copyLog()">Copy Log</button><button onclick="clearLog()">Clear</button>
+<div id="status">Connecting...</div><pre id="log"></pre>
+<script>
+const q=new URLSearchParams(location.search),host=q.get("server")||"localhost",port=Number(q.get("port")||3000);
+const url=(port===443?"wss":"ws")+"://"+host+":"+port+"/", L=[], log=document.getElementById("log"), status=document.getElementById("status");
+function hex(a,n=768){return Array.from(a.slice(0,n),x=>x.toString(16).padStart(2,"0")).join(" ")+(a.length>n?" ...":"")}
+function add(k,s){L.push("["+new Date().toISOString()+"] "+k+" "+s);log.textContent=L.join("\n");log.scrollTop=log.scrollHeight}
+add("INFO","Target "+url);
+const ws=new WebSocket(url); ws.binaryType="arraybuffer";
+ws.onopen=()=>{status.textContent="CONNECTED — "+url;let h={handshake:{version:2,client:"WebSource",dataType:"Protobuf",gzip:false}};ws.send(JSON.stringify(h));add("OPEN","connected");add("SEND",JSON.stringify(h))};
+ws.onmessage=async e=>{if(typeof e.data==="string")add("TEXT",e.data);else if(e.data instanceof Blob){let b=await e.data.arrayBuffer();add("BINARY","Blob "+b.byteLength+" bytes HEX="+hex(new Uint8Array(b)))}else add("BINARY","ArrayBuffer "+e.data.byteLength+" bytes HEX="+hex(new Uint8Array(e.data)))};
+ws.onerror=()=>{status.textContent="WEBSOCKET ERROR — "+url;add("ERROR","websocket error")};
+ws.onclose=e=>{status.textContent="DISCONNECTED — "+url;add("CLOSE","code="+e.code+" reason="+(e.reason||"none"))};
+function clearLog(){L.length=0;add("INFO","log cleared")}
+async function copyLog(){await navigator.clipboard.writeText(L.join("\n"))}
+function downloadLog(){let b=new Blob([L.join("\n")],{type:"text/plain"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="pokelink-battle-diagnostic.txt";a.click()}
+</script></body></html>
