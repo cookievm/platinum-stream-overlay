@@ -1,42 +1,23 @@
-<!doctype html><html><head><meta charset="utf-8"><title>Now Playing v3.1</title><style>
+<!doctype html><html><head><meta charset="utf-8"><title>Now Playing</title><style>
 :root{--purple:#6335f5;--purple2:#9148ff;--panel1:#171443;--panel2:#0b0927}
-*{box-sizing:border-box}html,body{margin:0;background:transparent;overflow:hidden;font-family:Arial,Helvetica,sans-serif}
-body{padding:18px}
-.card{width:650px;height:142px;padding:15px 20px;display:flex;align-items:center;gap:18px;background:linear-gradient(135deg,var(--panel1),var(--panel2));border:3px solid var(--purple);border-radius:22px;box-shadow:0 0 12px var(--purple),0 0 26px #9148ff88,inset 0 0 18px #6335f52e}
+*{box-sizing:border-box}html,body{margin:0;background:transparent!important;overflow:hidden;font-family:Arial,Helvetica,sans-serif}
+body{padding:18px}.card{width:650px;height:142px;padding:15px 20px;display:flex;align-items:center;gap:18px;background:linear-gradient(135deg,var(--panel1),var(--panel2));border:3px solid var(--purple);border-radius:22px;box-shadow:0 0 12px var(--purple),0 0 26px #9148ff88,inset 0 0 18px #6335f52e}
 .logoBox{width:106px;height:106px;flex:none;border-radius:17px;border:2px solid var(--purple2);box-shadow:0 0 14px #9148ff88;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 35% 30%,#292268,#100d31 70%)}
-.spotifyLogo{width:76px;height:76px}
-.info{min-width:0;flex:1}
-.label{font-size:13px;font-weight:900;letter-spacing:2px;color:#bcaaff;margin-bottom:7px}
+.spotifyLogo{width:76px;height:76px}.info{min-width:0;flex:1}.label{font-size:13px;font-weight:900;letter-spacing:2px;color:#bcaaff;margin-bottom:7px}
 .title{color:#fff;font-size:29px;font-weight:1000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:-2px -2px 0 #000,2px -2px 0 #000,-2px 2px 0 #000,2px 2px 0 #000,0 0 10px var(--purple2)}
 .artist{margin-top:7px;color:#d9d2ff;font-size:19px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-</style></head><body>
-<div class="card">
- <div class="logoBox">
-  <!-- White Spotify-style circle; the three curved lines are cut out so the purple background shows through. -->
-  <svg class="spotifyLogo" viewBox="0 0 100 100" aria-label="Spotify">
-   <defs>
-    <mask id="cut">
-     <rect width="100" height="100" fill="white"/>
-     <path d="M22 37 C43 30 67 32 82 40" fill="none" stroke="black" stroke-width="8" stroke-linecap="round"/>
-     <path d="M25 51 C44 45 64 47 78 54" fill="none" stroke="black" stroke-width="7" stroke-linecap="round"/>
-     <path d="M29 65 C45 60 60 62 72 68" fill="none" stroke="black" stroke-width="6" stroke-linecap="round"/>
-    </mask>
-   </defs>
-   <circle cx="50" cy="50" r="45" fill="white" mask="url(#cut)"/>
-  </svg>
- </div>
- <div class="info">
-  <div class="label">NOW PLAYING</div>
-  <div id="title" class="title">Waiting for Spotify…</div>
-  <div id="artist" class="artist"></div>
- </div>
-</div>
+</style></head><body><div class="card"><div class="logoBox"><svg class="spotifyLogo" viewBox="0 0 100 100"><defs><mask id="cut"><rect width="100" height="100" fill="white"/><path d="M22 37 C43 30 67 32 82 40" fill="none" stroke="black" stroke-width="8" stroke-linecap="round"/><path d="M25 51 C44 45 64 47 78 54" fill="none" stroke="black" stroke-width="7" stroke-linecap="round"/><path d="M29 65 C45 60 60 62 72 68" fill="none" stroke="black" stroke-width="6" stroke-linecap="round"/></mask></defs><circle cx="50" cy="50" r="45" fill="white" mask="url(#cut)"/></svg></div><div class="info"><div class="label">NOW PLAYING</div><div id="title" class="title">Waiting for Spotify…</div><div id="artist" class="artist"></div></div></div>
 <script>
-function load(){
- let old=document.getElementById("np");if(old)old.remove();
- let s=document.createElement("script");s.id="np";s.src="now_playing.js?t="+Date.now();
- s.onload=()=>{let n=window.NOW_PLAYING||{};title.textContent=n.title||"Waiting for Spotify…";artist.textContent=n.artist||""};
- document.body.appendChild(s)
+const q=new URLSearchParams(location.search);
+let bridge=(q.get("bridge")||localStorage.getItem("spotifyBridge")||"").replace(/\/+$/,"");
+if(q.get("bridge")) localStorage.setItem("spotifyBridge",bridge);
+async function poll(){
+ if(!bridge)return;
+ try{
+   const r=await fetch(bridge+"/state?t="+Date.now(),{cache:"no-store"});
+   if(!r.ok)throw 0; const n=await r.json();
+   title.textContent=n.title||"Waiting for Spotify…";artist.textContent=n.artist||"";
+ }catch(e){}
 }
-setInterval(load,500);load();
+setInterval(poll,500);poll();
 </script></body></html>
