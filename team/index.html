@@ -13,13 +13,13 @@ body{display:flex;align-items:center;justify-content:center;font-family:"Arial B
 .ball{position:absolute;left:5%;top:4%;width:clamp(18px,2.2vw,40px);aspect-ratio:1;border-radius:50%;background:linear-gradient(#f23855 0 44%,#101018 44% 56%,#f8f8f8 56%);border:2px solid #080716;box-shadow:0 1px 3px #000}
 .ball:after{content:"";position:absolute;width:27%;aspect-ratio:1;border-radius:50%;background:#fff;border:2px solid #111;left:36%;top:36%}
 .gender{position:absolute;right:5%;top:2%;font-weight:1000;font-size:clamp(21px,2.8vw,50px);line-height:1;text-shadow:0 3px 0 #060615}.male{color:#409eff}.female{color:#ff3d91}.unknown{display:none}
-.spriteWrap{display:flex;align-items:center;justify-content:center;min-height:0;padding-top:5%}
-.sprite{max-width:86%;max-height:88%;width:auto;height:auto;image-rendering:pixelated;image-rendering:crisp-edges;filter:drop-shadow(0 4px 2px rgba(0,0,0,.55))}
+.spriteWrap{display:flex;align-items:center;justify-content:center;min-height:0;padding-top:2%}
+.sprite{max-width:98%;max-height:100%;width:auto;height:auto;image-rendering:pixelated;image-rendering:crisp-edges;filter:drop-shadow(0 4px 2px rgba(0,0,0,.55))}
 .name,.hpText{color:#fff;font-weight:1000;text-align:center;white-space:nowrap;text-shadow:-2px -2px 0 #08080e,2px -2px 0 #08080e,-2px 2px 0 #08080e,2px 2px 0 #08080e,0 4px 0 #08080e}
-.name{text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;font-size:clamp(13px,2vw,38px);letter-spacing:-.055em;line-height:1.05;margin:0 0 3%}
+.name{text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;font-size:clamp(11px,1.55vw,30px);letter-spacing:-.06em;line-height:1.05;margin:0 0 3%}
 .hpArea{display:grid;grid-template-rows:auto auto;gap:5%;padding-bottom:1%}.hpTrack{height:clamp(10px,1.18vw,21px);border-radius:999px;background:#ececec;padding:clamp(2px,.16vw,4px);box-shadow:0 0 0 2px #09081c,0 2px 4px #000}
 .hpFill{height:100%;width:100%;border-radius:999px;background:linear-gradient(90deg,#15c96c,#38ed92);transition:width .3s ease}
-.hpText{display:block;width:100%;text-align:center;font-size:clamp(12px,1.5vw,29px);line-height:1.15;min-height:1.15em}
+.hpText{display:block;width:100%;text-align:center;color:#fff;font-weight:1000;font-size:clamp(10px,1.25vw,24px);letter-spacing:-.045em;line-height:1.1;min-height:1.1em;text-shadow:-2px -2px 0 #08080e,2px -2px 0 #08080e,-2px 2px 0 #08080e,2px 2px 0 #08080e,0 3px 0 #08080e}
 </style></head>
 <body><div id="team"></div>
 <script type="module">
