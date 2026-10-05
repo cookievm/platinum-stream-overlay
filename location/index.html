@@ -3,73 +3,138 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Platinum Encounter Tracker</title>
-<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
 <style>
-:root{--purple:#7650ff;--label:#9477ff;--panel:#0c0b22;--white:#f8f8fb}
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:transparent!important}
-body{display:flex;align-items:center;justify-content:center;font-family:Arial Black,Arial,sans-serif}
-.card{width:2000px;height:300px;border:14px solid var(--purple);border-radius:76px;background:var(--panel);
-box-shadow:0 0 20px #6032ff,0 0 36px #6032ff88;display:grid;grid-template-columns:820px 10px 1fr;
-align-items:center;padding:26px 64px;gap:54px}
-.label{color:var(--label);font-size:52px;font-weight:900;letter-spacing:5px;line-height:1;margin-bottom:20px}
-.location{color:var(--white);font-size:100px;font-weight:900;line-height:.92;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.divider{width:10px;height:205px;border-radius:8px;background:var(--label)}
-.right{display:flex;align-items:center;gap:45px;min-width:0}.sprite{width:190px;height:190px;object-fit:contain;flex:0 0 190px;image-rendering:pixelated}
-.text{color:var(--white);font-size:72px;font-weight:900;line-height:1.02}.nickname{font-size:88px;text-transform:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#dbg{display:none;position:fixed;left:8px;bottom:8px;background:#000e;color:#fff;padding:8px 12px;border-radius:6px;font:13px Consolas,monospace}
-body.debug #dbg{display:block}
-</style></head>
+:root{--purple:#754cff;--label:#9276ff;--panel:#0d0c24;--white:#f8f8fb}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:transparent!important}
+body{display:flex;align-items:center;justify-content:center;font-family:"Arial Black","Trebuchet MS",Arial,sans-serif}
+#card{width:100vw;aspect-ratio:6.65/1;max-height:100vh;border:clamp(5px,.68vw,14px) solid var(--purple);
+ border-radius:clamp(24px,3.7vw,76px);background:var(--panel);
+ box-shadow:0 0 clamp(10px,1vw,20px) #6032ff,0 0 clamp(18px,1.9vw,38px) rgba(96,50,255,.55);
+ display:grid;grid-template-columns:40.5% .55% 1fr;align-items:center;padding:1.25% 3.1%;gap:2.7%}
+.left{min-width:0;padding-left:.5%}
+.kind{color:var(--label);font-size:clamp(18px,2.55vw,54px);font-weight:1000;letter-spacing:.12em;line-height:1;margin:0 0 2.7%;text-transform:uppercase}
+.place{color:var(--white);font-size:clamp(34px,5vw,104px);font-weight:1000;line-height:.94;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase;
+ text-shadow:0 3px 0 #060615}
+.divider{height:72%;width:100%;border-radius:999px;background:var(--label)}
+.right{display:flex;align-items:center;gap:5%;min-width:0;height:100%}
+.visual{width:19%;aspect-ratio:1;flex:0 0 19%;display:flex;align-items:center;justify-content:center}
+.visual img{max-width:100%;max-height:100%;object-fit:contain}
+.visual img.pokemon{image-rendering:pixelated;image-rendering:crisp-edges;filter:drop-shadow(0 4px 2px rgba(0,0,0,.55))}
+.status{color:var(--white);font-size:clamp(26px,3.55vw,74px);font-weight:1000;line-height:1.03;text-transform:uppercase;min-width:0;text-shadow:0 3px 0 #060615}
+.status.nickname{font-size:clamp(34px,4.4vw,92px);text-transform:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#debug{display:none;position:fixed;left:8px;bottom:8px;max-width:95vw;background:#000e;color:#fff;padding:8px 11px;border-radius:6px;font:12px Consolas,monospace}
+body.debug #debug{display:block}
+</style>
+</head>
 <body>
-<div class="card"><div><div class="label" id="label">ROUTE</div><div class="location" id="location">ROUTE 201</div></div>
-<div class="divider"></div><div class="right"><img class="sprite" id="sprite" src="pokeball.svg"><div class="text" id="state">ENCOUNTER<br>AVAILABLE</div></div></div>
-<div id="dbg">Starting…</div>
-<script>
-(()=>{
- const Q=new URLSearchParams(location.search);
- const server=(Q.get('server')||'').trim(), port=(Q.get('port')||'443').trim(), user=(Q.get('user')||'').trim();
- if(Q.get('debug')==='1')document.body.classList.add('debug');
- const dbg=document.getElementById('dbg'), log=x=>{dbg.textContent=x;console.log('[encounter]',x)};
- const AREAS={}; for(let n=201;n<=230;n++)AREAS['route'+n]={type:'ROUTE',name:'ROUTE '+n,metIds:[]};
- Object.assign(AREAS,{
-  jubilife:{type:'CITY',name:'JUBILIFE',metIds:[]},oreburgh:{type:'CITY',name:'OREBURGH',metIds:[]},
-  floaroma:{type:'TOWN',name:'FLOAROMA',metIds:[]},eterna:{type:'CITY',name:'ETERNA',metIds:[]},
-  hearthome:{type:'CITY',name:'HEARTHOME',metIds:[]},solaceon:{type:'TOWN',name:'SOLACEON',metIds:[]},
-  veilstone:{type:'CITY',name:'VEILSTONE',metIds:[]},pastoria:{type:'CITY',name:'PASTORIA',metIds:[]},
-  celestic:{type:'TOWN',name:'CELESTIC',metIds:[]},canalave:{type:'CITY',name:'CANALAVE',metIds:[]},
-  snowpoint:{type:'CITY',name:'SNOWPOINT',metIds:[]},sunyshore:{type:'CITY',name:'SUNYSHORE',metIds:[]},
-  eternaforest:{type:'AREA',name:'ETERNA FOREST',metIds:[]},oreburghmine:{type:'AREA',name:'OREBURGH MINE',metIds:[]}
- });
- let area=Q.get('area')||localStorage.getItem('pt-area')||'route201'; if(!AREAS[area])area='route201';
- let caught=JSON.parse(localStorage.getItem('pt-catches')||'{}');
- const label=document.getElementById('label'),loc=document.getElementById('location'),spr=document.getElementById('sprite'),state=document.getElementById('state');
- const save=()=>localStorage.setItem('pt-catches',JSON.stringify(caught));
- function spriteURL(p){const id=Number(p?.species);if(!id)return'';return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-iv/platinum/${p?.isShiny?'shiny/':''}${id}.png`}
- function draw(){const a=AREAS[area];label.textContent=a.type;loc.textContent=a.name;localStorage.setItem('pt-area',area);const c=caught[area];
-  if(c){spr.src=c.sprite||'pokeball.svg';state.className='text nickname';state.textContent=c.nickname||c.speciesName||'Caught'}
-  else{spr.src='pokeball.svg';state.className='text';state.innerHTML='ENCOUNTER<br>AVAILABLE'}}
- function party(xs){if(!Array.isArray(xs))return;xs.forEach(m=>{const p=m?.pokemon||m;if(!p)return;
-   console.log('[encounter] Pokémon', {nickname:p.nickname,species:p.species,speciesName:p.speciesName,locationMet:p.locationMet,pid:p.pid});
-   if(!caught[area]&&AREAS[area].metIds.includes(Number(p.locationMet))){caught[area]={nickname:p.nickname,speciesName:p.speciesName,sprite:spriteURL(p),locationMet:p.locationMet,pid:p.pid};save();draw()}
-  })}
- function connect(){
-  if(!server){log('Add ?server=YOUR_SERVER&port=443&user=YOUR_USER');return}
-  let base=/^https?:\/\//i.test(server)?server:`https://${server}`;
-  if(port && port!=='443' && !new RegExp(':'+port+'$').test(base))base+=':'+port;
-  log('Connecting to '+base);
-  const socket=io(base,{transports:['websocket','polling'],reconnection:true,rejectUnauthorized:false});
-  socket.on('connect',()=>log('Connected • '+AREAS[area].name));
-  socket.on('connect_error',e=>log('Connection error: '+(e?.message||e)));
-  socket.on('client:players:list',players=>{if(!Array.isArray(players))return;const p=user?players.find(x=>String(x.username).toLowerCase()===user.toLowerCase()):players[0];if(p)party(p.party||[])});
-  socket.on('client:party:updated',d=>{if(user&&d?.username&&String(d.username).toLowerCase()!==user.toLowerCase())return;party(d?.update?.party||d)});
+<div id="card">
+ <div class="left"><div class="kind" id="kind">ROUTE</div><div class="place" id="place">ROUTE 201</div></div>
+ <div class="divider"></div>
+ <div class="right"><div class="visual"><img id="visual" src="./pokeball.svg"></div><div class="status" id="status">ENCOUNTER<br>AVAILABLE</div></div>
+</div>
+<div id="debug">Starting…</div>
+
+<script type="module">
+import { V2 } from "./pokelink.js";
+
+const q=new URLSearchParams(location.search);
+const host=q.get("server")||"localhost";
+const port=Number(q.get("port")||3000);
+const users=q.get("users")||"cookievm";
+const debug=q.get("debug")==="1";
+if(debug)document.body.classList.add("debug");
+const dbg=document.getElementById("debug");
+const log=(x)=>{dbg.textContent=x;console.log("[Encounter Tracker]",x)};
+
+const AREAS={};
+for(let n=201;n<=230;n++)AREAS["route"+n]={kind:"ROUTE",name:"ROUTE "+n,metIds:[]};
+Object.assign(AREAS,{
+ twinleaf:{kind:"TOWN",name:"TWINLEAF",metIds:[]},
+ sandgem:{kind:"TOWN",name:"SANDGEM",metIds:[]},
+ jubilife:{kind:"CITY",name:"JUBILIFE",metIds:[]},
+ oreburgh:{kind:"CITY",name:"OREBURGH",metIds:[]},
+ floaroma:{kind:"TOWN",name:"FLOAROMA",metIds:[]},
+ eterna:{kind:"CITY",name:"ETERNA",metIds:[]},
+ hearthome:{kind:"CITY",name:"HEARTHOME",metIds:[]},
+ solaceon:{kind:"TOWN",name:"SOLACEON",metIds:[]},
+ veilstone:{kind:"CITY",name:"VEILSTONE",metIds:[]},
+ pastoria:{kind:"CITY",name:"PASTORIA",metIds:[]},
+ celestic:{kind:"TOWN",name:"CELESTIC",metIds:[]},
+ canalave:{kind:"CITY",name:"CANALAVE",metIds:[]},
+ snowpoint:{kind:"CITY",name:"SNOWPOINT",metIds:[]},
+ sunyshore:{kind:"CITY",name:"SUNYSHORE",metIds:[]},
+ eternaforest:{kind:"AREA",name:"ETERNA FOREST",metIds:[]},
+ oreburghmine:{kind:"AREA",name:"OREBURGH MINE",metIds:[]},
+ ravagedpath:{kind:"AREA",name:"RAVAGED PATH",metIds:[]},
+ valleywindworks:{kind:"AREA",name:"VALLEY WINDWORKS",metIds:[]},
+ mtcoronet:{kind:"AREA",name:"MT. CORONET",metIds:[]},
+ greatmarsh:{kind:"AREA",name:"GREAT MARSH",metIds:[]}
+});
+
+let area=q.get("area")||localStorage.getItem("ptEncounter.currentArea")||"route201";
+if(!AREAS[area])area="route201";
+let caught={};
+try{caught=JSON.parse(localStorage.getItem("ptEncounter.catches")||"{}")}catch{}
+
+const kindEl=document.getElementById("kind"),placeEl=document.getElementById("place"),
+ visual=document.getElementById("visual"),status=document.getElementById("status");
+
+function save(){localStorage.setItem("ptEncounter.catches",JSON.stringify(caught))}
+function sprite(mon){
+ const id=Number(mon?.species);
+ if(!Number.isInteger(id)||id<1||id>493)return null;
+ const shiny=mon?.isShiny===true?"shiny/":"";
+ const female=String(mon?.gender||"").toLowerCase()==="female"?"female/":"";
+ const root="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-iv/platinum/";
+ return {a:`${root}${shiny}${female}${id}.png`,b:`${root}${shiny}${id}.png`};
+}
+function draw(){
+ const a=AREAS[area];
+ localStorage.setItem("ptEncounter.currentArea",area);
+ kindEl.textContent=a.kind; placeEl.textContent=a.name;
+ const c=caught[area];
+ if(!c){
+   visual.className=""; visual.src="./pokeball.svg";
+   status.className="status"; status.innerHTML="ENCOUNTER<br>AVAILABLE"; return;
  }
- window.encounterTracker={
-  setArea:k=>{if(AREAS[k]){area=k;draw()}},
-  markCaught:(nickname,species)=>{caught[area]={nickname,sprite:`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-iv/platinum/${species}.png`};save();draw()},
-  available:()=>{delete caught[area];save();draw()},
-  resetAll:()=>{caught={};save();draw()},
-  setMetId:(k,id)=>{if(AREAS[k]&&!AREAS[k].metIds.includes(Number(id)))AREAS[k].metIds.push(Number(id))},
-  areas:AREAS
- };
- draw();connect();
-})();
-</script></body></html>
+ visual.className="pokemon";
+ visual.onerror=()=>{if(c.fallback&&visual.src!==c.fallback){visual.onerror=null;visual.src=c.fallback}};
+ visual.src=c.sprite||"./pokeball.svg";
+ status.className="status nickname";
+ status.textContent=c.nickname||c.name||"POKÉMON";
+}
+function remember(mon){
+ const met=Number(mon?.locationMet);
+ if(debug)console.log("[Encounter Tracker] Pokémon data:",mon,"locationMet:",mon?.locationMet);
+ if(caught[area]||!Number.isFinite(met)||!AREAS[area].metIds.includes(met))return;
+ const u=sprite(mon);
+ caught[area]={nickname:String(mon?.nickname||mon?.name||"POKÉMON"),species:Number(mon?.species)||0,
+ locationMet:met,sprite:u?.a||"",fallback:u?.b||""};
+ save();draw();
+}
+function renderParty(party,username){
+ if(username&&username!==users)return;
+ if(!Array.isArray(party))return;
+ for(const mon of party)if(mon&&V2.isValidPokemon(mon))remember(mon);
+ log(`Connected • ${username||users} • ${AREAS[area].name}`);
+}
+
+V2.onPartyUpdate(renderParty);
+V2.initialize({numberOfPlayers:1,listenForSpriteUpdates:false,host,port,users:[users],useFallbackSprites:true});
+
+window.encounterTracker={
+ setArea(k){if(AREAS[k]){area=k;draw();return true}return false},
+ markCaught(nickname,species){
+   const mon={nickname,species:Number(species),gender:"",isShiny:false},u=sprite(mon);
+   caught[area]={nickname:String(nickname),species:Number(species),sprite:u?.a||"",fallback:u?.b||""};save();draw();
+ },
+ available(){delete caught[area];save();draw()},
+ resetAll(){caught={};save();draw()},
+ addMetId(k,id){if(!AREAS[k])return false;id=Number(id);if(!AREAS[k].metIds.includes(id))AREAS[k].metIds.push(id);return true},
+ areas:AREAS
+};
+draw();
+log(`Connecting to ${host}:${port} • ${AREAS[area].name}`);
+</script>
+</body></html>
