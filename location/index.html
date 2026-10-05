@@ -134,6 +134,20 @@ window.encounterTracker={
  addMetId(k,id){if(!AREAS[k])return false;id=Number(id);if(!AREAS[k].metIds.includes(id))AREAS[k].metIds.push(id);return true},
  areas:AREAS
 };
+ function receiveControl(){
+  const next=localStorage.getItem("ptEncounter.currentArea");
+  if(next && AREAS[next] && next!==area){area=next;draw()}
+  let cmd=null;
+  try{cmd=JSON.parse(localStorage.getItem("ptEncounter.command")||"null")}catch{}
+  if(!cmd || cmd.at===receiveControl.last)return;
+  receiveControl.last=cmd.at;
+  if(cmd.type==="setArea" && AREAS[cmd.area]){area=cmd.area;draw()}
+  if(cmd.type==="available")window.encounterTracker.available();
+  if(cmd.type==="resetAll")window.encounterTracker.resetAll();
+}
+receiveControl.last=0;
+window.addEventListener("storage",receiveControl);
+setInterval(receiveControl,500);
 draw();
 log(`Connecting to ${host}:${port} • ${AREAS[area].name}`);
 </script>
