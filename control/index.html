@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Platinum Encounter Control</title>
+<style>
+:root{--p:#754cff;--l:#9a79ff;--bg:#0d0c24;--card:#15132f;--w:#f8f8fb}
+*{box-sizing:border-box}body{margin:0;background:#080716;color:var(--w);font-family:Arial,sans-serif;padding:24px}
+.wrap{max-width:1000px;margin:auto}.top{border:2px solid var(--p);background:var(--bg);border-radius:20px;padding:20px;box-shadow:0 0 18px #6032ff66}
+h1{margin:0 0 8px;font-size:28px}.sub{color:#bbb;margin-bottom:18px}.current{font-size:20px;color:var(--l);font-weight:800}
+h2{margin:28px 0 12px;color:var(--l);font-size:16px;letter-spacing:.12em}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:10px}
+button{border:2px solid #42387b;background:var(--card);color:white;border-radius:12px;padding:13px 10px;font-weight:800;cursor:pointer;font-size:14px}
+button:hover,button.active{border-color:var(--p);box-shadow:0 0 12px #6032ff88;background:#211b4d}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.danger{border-color:#7b3846}
+.note{margin-top:20px;color:#aaa;font-size:13px;line-height:1.5}
+</style></head><body><div class="wrap">
+<div class="top"><h1>Platinum Encounter Control</h1><div class="sub">Click a location to update the encounter overlay.</div>
+<div class="current">Current: <span id="current">ROUTE 201</span></div></div>
+<h2>ROUTES</h2><div class="grid" id="routes"></div>
+<h2>TOWNS & CITIES</h2><div class="grid" id="places"></div>
+<h2>OTHER AREAS</h2><div class="grid" id="areas"></div>
+<div class="actions"><button id="available">Reset current encounter to AVAILABLE</button><button class="danger" id="reset">Reset ALL encounter records</button></div>
+<div class="note">Keep this page open in a normal browser while streaming. The control page and overlay communicate through browser storage. Both pages must be on the same GitHub Pages origin.</div>
+</div>
+<script>
+const routes={};for(let n=201;n<=230;n++)routes["route"+n]="Route "+n;
+const places={twinleaf:"Twinleaf",sandgem:"Sandgem",jubilife:"Jubilife",oreburgh:"Oreburgh",floaroma:"Floaroma",eterna:"Eterna",hearthome:"Hearthome",solaceon:"Solaceon",veilstone:"Veilstone",pastoria:"Pastoria",celestic:"Celestic",canalave:"Canalave",snowpoint:"Snowpoint",sunyshore:"Sunyshore"};
+const areas={eternaforest:"Eterna Forest",oreburghmine:"Oreburgh Mine",ravagedpath:"Ravaged Path",valleywindworks:"Valley Windworks",mtcoronet:"Mt. Coronet",greatmarsh:"Great Marsh"};
+let current=localStorage.getItem("ptEncounter.currentArea")||"route201";
+function broadcast(type,data={}){localStorage.setItem("ptEncounter.command",JSON.stringify({type,...data,at:Date.now()}))}
+function setArea(k,label){current=k;localStorage.setItem("ptEncounter.currentArea",k);broadcast("setArea",{area:k});document.getElementById("current").textContent=label.toUpperCase();paint()}
+function fill(id,obj){let e=document.getElementById(id);Object.entries(obj).forEach(([k,v])=>{let b=document.createElement("button");b.dataset.key=k;b.textContent=v;b.onclick=()=>setArea(k,v);e.appendChild(b)})}
+function paint(){document.querySelectorAll("button[data-key]").forEach(b=>b.classList.toggle("active",b.dataset.key===current))}
+fill("routes",routes);fill("places",places);fill("areas",areas);
+let all={...routes,...places,...areas};document.getElementById("current").textContent=(all[current]||current).toUpperCase();paint();
+document.getElementById("available").onclick=()=>broadcast("available");
+document.getElementById("reset").onclick=()=>{if(confirm("Reset every saved encounter?"))broadcast("resetAll")};
+</script></body></html>
